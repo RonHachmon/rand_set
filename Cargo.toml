@@ -1,9 +1,15 @@
 [package]
 name = "rand_set"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 description = "A hash set with O(1) random element access and all standard set operations"
 license = "MIT OR Apache-2.0"
+readme = "README.md"
+keywords = ["hash","rand", "hashSet", "set"]
+documentation = "https://docs.rs/rand_set" 
+homepage = "https://github.com/RonHachmon/rand_set"
+categories = ["data-structures"]
+repository = "https://github.com/RonHachmon/rand_set"
 
 [dependencies]
 rand = "0.9.1"
