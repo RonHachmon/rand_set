@@ -170,6 +170,17 @@ where
     pub fn iter(&self) -> std::slice::Iter<T> {
         self.items_vector.iter()
     }
+
+    pub fn is_disjoint(&self, other:&RandSet<T,S>) -> bool{
+
+        for item in &self.items_vector{
+            if other.contains(item){
+                return false;
+            }
+        }
+
+        true
+    }
 }
 
 impl<T> RandSet<T, RandomState>
@@ -367,5 +378,137 @@ mod tests {
         equal_rs.insert(23);
         assert!(rs != equal_rs);
 
+    }
+
+    #[test]
+    fn is_disjoint_empty_sets() {
+        // Two empty sets should be disjoint
+        let set1: RandSet<i32, RandomState> = RandSet::new();
+        let set2: RandSet<i32, RandomState> = RandSet::new();
+        
+        assert!(set1.is_disjoint(&set2));
+        assert!(set2.is_disjoint(&set1));
+    }
+
+    #[test]
+    fn is_disjoint_one_empty_set() {
+        // Empty set is disjoint with any set
+        let mut set1: RandSet<i32, RandomState> = RandSet::new();
+        let set2: RandSet<i32, RandomState> = RandSet::new();
+        
+        set1.insert(1);
+        set1.insert(2);
+        set1.insert(3);
+        
+        assert!(set1.is_disjoint(&set2));
+        assert!(set2.is_disjoint(&set1));
+    }
+
+    #[test]
+    fn is_disjoint_completely_different_sets() {
+        // Sets with completely different elements should be disjoint
+        let mut set1: RandSet<i32, RandomState> = RandSet::new();
+        let mut set2: RandSet<i32, RandomState> = RandSet::new();
+        
+        set1.insert(1);
+        set1.insert(2);
+        set1.insert(3);
+        
+        set2.insert(4);
+        set2.insert(5);
+        set2.insert(6);
+        
+        assert!(set1.is_disjoint(&set2));
+        assert!(set2.is_disjoint(&set1));
+    }
+
+    #[test]
+    fn is_disjoint_overlapping_sets() {
+        // Sets with common elements should NOT be disjoint
+        let mut set1: RandSet<i32, RandomState> = RandSet::new();
+        let mut set2: RandSet<i32, RandomState> = RandSet::new();
+        
+        set1.insert(1);
+        set1.insert(2);
+        set1.insert(3);
+        
+        set2.insert(3);  // Common element
+        set2.insert(4);
+        set2.insert(5);
+        
+        assert!(!set1.is_disjoint(&set2));
+        assert!(!set2.is_disjoint(&set1));
+    }
+
+    #[test]
+    fn is_disjoint_identical_sets() {
+        // Identical sets should NOT be disjoint
+        let mut set1: RandSet<i32, RandomState> = RandSet::new();
+        let mut set2: RandSet<i32, RandomState> = RandSet::new();
+        
+        set1.insert(1);
+        set1.insert(2);
+        set1.insert(3);
+        
+        set2.insert(1);
+        set2.insert(2);
+        set2.insert(3);
+        
+        assert!(!set1.is_disjoint(&set2));
+        assert!(!set2.is_disjoint(&set1));
+    }
+
+    #[test]
+    fn is_disjoint_single_element_overlap() {
+        // Even one common element makes sets non-disjoint
+        let mut set1: RandSet<String, RandomState> = RandSet::new();
+        let mut set2: RandSet<String, RandomState> = RandSet::new();
+        
+        set1.insert("apple".to_string());
+        set1.insert("banana".to_string());
+        set1.insert("cherry".to_string());
+        
+        set2.insert("cherry".to_string());  // Only one common element
+        set2.insert("date".to_string());
+        set2.insert("elderberry".to_string());
+        
+        assert!(!set1.is_disjoint(&set2));
+        assert!(!set2.is_disjoint(&set1));
+    }
+
+    #[test]
+    fn is_disjoint_subset_relationship() {
+        // If one set is a subset of another, they're not disjoint
+        let mut set1: RandSet<i32, RandomState> = RandSet::new();
+        let mut set2: RandSet<i32, RandomState> = RandSet::new();
+        
+        set1.insert(1);
+        set1.insert(2);
+        
+        set2.insert(1);
+        set2.insert(2);
+        set2.insert(3);
+        set2.insert(4);
+        
+        assert!(!set1.is_disjoint(&set2));
+        assert!(!set2.is_disjoint(&set1));
+    }
+
+    #[test]
+    fn is_disjoint_single_element_sets() {
+        // Test with single element sets
+        let mut set1: RandSet<char, RandomState> = RandSet::new();
+        let mut set2: RandSet<char, RandomState> = RandSet::new();
+        let mut set3: RandSet<char, RandomState> = RandSet::new();
+        
+        set1.insert('a');
+        set2.insert('b');
+        set3.insert('a');
+        
+        assert!(set1.is_disjoint(&set2));  // Different elements
+        assert!(set2.is_disjoint(&set1));
+        
+        assert!(!set1.is_disjoint(&set3)); // Same element
+        assert!(!set3.is_disjoint(&set1));
     }
 }
